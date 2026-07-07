@@ -247,6 +247,22 @@ a { color: var(--blue); text-decoration: none; }
 }
 .hero-social a:hover { background: rgba(79,209,255,0.15); border-color: rgba(79,209,255,0.4); color: #fff; }
 
+.hero-social a.sn-ig {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  border-color: transparent; color: #fff;
+}
+.hero-social a.sn-ig:hover { filter: brightness(1.12); background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+
+.hero-social a.sn-yt {
+  background: #ff0000; border-color: transparent; color: #fff;
+}
+.hero-social a.sn-yt:hover { background: #e50000; }
+
+.hero-social a.sn-fb {
+  background: #1877f2; border-color: transparent; color: #fff;
+}
+.hero-social a.sn-fb:hover { background: #1568d8; }
+
 .hero-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 .hero-acum-label { font-size: 11px; color: #6f89bd; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
 .hero-acum { font-family: var(--mono); font-size: 54px; font-weight: 700; color: #3ee596; letter-spacing: -2px; line-height: 1; text-shadow: 0 0 40px rgba(62,229,150,0.3); }
@@ -502,9 +518,9 @@ footer { background: var(--navy); margin-top: 40px; padding: 28px 0; }
         <div class="hero-title">El imán del<br><span class="grad">VWAP</span>&nbsp;&nbsp;en acción</div>
         <div class="hero-desc">GRAVITÓN opera reversión a la media en MNQ Futuros. El VWAP es su imán — el precio regresa a tocarlo. Si los 30 días son rentables, inicia cuenta real con $1,000 USD.</div>
         <div class="hero-social">
-          <a href="https://www.instagram.com/tradingtrading.futuros/" target="_blank" rel="noopener">Instagram</a>
-          <a href="https://www.youtube.com/@tradingtrading.futuros" target="_blank" rel="noopener">YouTube</a>
-          <a href="https://www.facebook.com/profile.php?id=100036867265736" target="_blank" rel="noopener">Facebook</a>
+          <a class="sn-ig" href="https://www.instagram.com/tradingtrading.futuros/" target="_blank" rel="noopener">Instagram</a>
+          <a class="sn-yt" href="https://www.youtube.com/@tradingtrading.futuros" target="_blank" rel="noopener">YouTube</a>
+          <a class="sn-fb" href="https://www.facebook.com/profile.php?id=100036867265736" target="_blank" rel="noopener">Facebook</a>
         </div>
       </div>
       <div class="hero-right">
