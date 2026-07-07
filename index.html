@@ -768,22 +768,64 @@ let diasData = [
   { dia:14, fecha:'06-Jul', t1:null,   t2:null,    t3:null,  total:0,      acum:145.40,  vxn:27,   contexto:'Alcista — sin setup en -1σ' },
 ];
 
-const tickerItems = [
-  { label:'ÍNDICE', name:'Nasdaq 100 Futures (NQ)', value:'30,293.50', change:'+1.49%', dir:'up', url:'https://mx.investing.com/indices/nq-100-futures' },
-  { label:'VOLATILIDAD', name:'CBOE Nasdaq 100 Volatility (VXN)', value:'30.82', change:'-4.70%', dir:'down', url:'https://mx.investing.com/indices/cboe-nasdaq-100-voltility' },
+const tickerConfig = [
+  { key:'nq',  label:'ÍNDICE',      name:'Nasdaq 100 Futures (NQ)',              symbol:'NQ=F', url:'https://mx.investing.com/indices/nq-100-futures' },
+  { key:'vxn', label:'VOLATILIDAD', name:'CBOE Nasdaq 100 Volatility (VXN)',     symbol:'^VXN', url:'https://mx.investing.com/indices/cboe-nasdaq-100-voltility' },
 ];
+
+// Valores de respaldo mientras carga el primer fetch real (o si la fuente falla)
+let liveData = {
+  nq:  { value: '30,293.50', change: '+1.49%', dir: 'up' },
+  vxn: { value: '30.82',     change: '-4.70%', dir: 'down' },
+};
+
+async function fetchQuote(symbol){
+  const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(symbol);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('bad response');
+  const json = await res.json();
+  const meta = json.chart.result[0].meta;
+  const price = meta.regularMarketPrice;
+  const prevClose = meta.previousClose ?? meta.chartPreviousClose;
+  const pct = ((price - prevClose) / prevClose) * 100;
+  return { price, pct };
+}
+
+async function refreshLiveData(){
+  try {
+    const [nq, vxn] = await Promise.all([fetchQuote('NQ=F'), fetchQuote('^VXN')]);
+    liveData.nq = {
+      value: nq.price.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}),
+      change: (nq.pct>=0?'+':'') + nq.pct.toFixed(2) + '%',
+      dir: nq.pct>=0 ? 'up' : 'down'
+    };
+    liveData.vxn = {
+      value: vxn.price.toFixed(2),
+      change: (vxn.pct>=0?'+':'') + vxn.pct.toFixed(2) + '%',
+      dir: vxn.pct>=0 ? 'up' : 'down'
+    };
+  } catch(e) {
+    // Fuente no disponible en este momento — se conserva el último valor mostrado
+  }
+  buildTicker();
+}
+
 function buildTicker(){
   const track = document.getElementById('tickerTrack');
   let html = '';
   for(let r=0;r<2;r++){
-    tickerItems.forEach(it=>{
-      const arrow = it.dir==='up' ? '▲' : '▼';
-      html += '<span class="ticker-item"><span class="tk-dot" style="background:'+(it.dir==='up'?'#3ee596':'#ff6b81')+'"></span><span class="tk-label">'+it.label+'</span><span class="tk-name">'+it.name+'</span><span class="tk-val">'+it.value+'</span><span class="tk-chg '+it.dir+'">'+arrow+' '+it.change+'</span><a href="'+it.url+'" target="_blank" rel="noopener">Ver cotización →</a></span>';
+    tickerConfig.forEach(cfg=>{
+      const d = liveData[cfg.key];
+      const arrow = d.dir==='up' ? '▲' : '▼';
+      html += '<span class="ticker-item"><span class="tk-dot" style="background:'+(d.dir==='up'?'#3ee596':'#ff6b81')+'"></span><span class="tk-label">'+cfg.label+'</span><span class="tk-name">'+cfg.name+'</span><span class="tk-val">'+d.value+'</span><span class="tk-chg '+d.dir+'">'+arrow+' '+d.change+'</span><a href="'+cfg.url+'" target="_blank" rel="noopener">Ver cotización →</a></span>';
     });
   }
   track.innerHTML = html;
 }
+
 buildTicker();
+refreshLiveData();
+setInterval(refreshLiveData, 60000);
 
 function fmtMoney(v){
   if(v===null) return '<span style="color:var(--text3)">—</span>';
