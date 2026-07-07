@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GRAVITÓN — Dashboard de Evaluación</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=PT+Serif:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
@@ -29,7 +29,8 @@
   --amber: #ff9500;
   --amber-light: #fff4e0;
   --mono: 'IBM Plex Mono', monospace;
-  --sans: 'Inter', sans-serif;
+  --sans: 'PT Serif', Georgia, serif;
+  --display: 'Playfair Display', Georgia, serif;
   --radius: 12px;
   --shadow: 0 1px 2px rgba(10,22,40,0.06), 0 1px 3px rgba(10,22,40,0.08);
   --shadow-md: 0 8px 24px rgba(10,22,40,0.10), 0 2px 6px rgba(10,22,40,0.06);
@@ -44,9 +45,66 @@ body {
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  position: relative;
 }
 
 a { color: var(--blue); text-decoration: none; }
+
+/* MARKET BACKGROUND — animated candlesticks + trend lines, blurred */
+.market-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--bg);
+  pointer-events: none;
+}
+
+.market-bg-layer {
+  position: absolute;
+  inset: -10% -10%;
+  background-repeat: repeat;
+  will-change: background-position;
+}
+
+.market-bg-grid {
+  background-image:
+    linear-gradient(rgba(10,22,40,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10,22,40,0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.market-bg-line1 {
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='320'%3E%3Cpath d='M0,220 C90,200 140,240 210,190 C280,140 320,230 400,180 C480,130 520,210 600,170 C680,130 730,190 810,150 C860,125 880,160 900,140' stroke='%230a2a5c' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-size: 900px 320px;
+  filter: blur(2.5px);
+  opacity: 0.10;
+  animation: bgDriftSlow 110s linear infinite;
+}
+
+.market-bg-line2 {
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1100' height='300'%3E%3Cpath d='M0,120 C120,150 200,90 320,130 C440,170 520,100 640,140 C760,180 840,110 960,150 C1020,170 1060,140 1100,155' stroke='%238a6d1f' stroke-width='1.3' fill='none'/%3E%3C/svg%3E");
+  background-size: 1100px 300px;
+  filter: blur(3px);
+  opacity: 0.07;
+  animation: bgDriftSlowReverse 150s linear infinite;
+}
+
+@keyframes bgDriftSlow {
+  from { background-position-x: 0; }
+  to { background-position-x: -900px; }
+}
+
+@keyframes bgDriftSlowReverse {
+  from { background-position-x: 0; }
+  to { background-position-x: 1100px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .market-bg-line1, .market-bg-line2 { animation: none; }
+}
+
+.wrap, .topbar, .hero, footer, .ticker-bar { position: relative; z-index: 1; }
 
 .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 
@@ -85,7 +143,11 @@ a { color: var(--blue); text-decoration: none; }
 
 .ticker-item .tk-label { color: #6f89bd; font-weight: 500; }
 .ticker-item .tk-name { color: #ffffff; font-weight: 600; }
-.ticker-item a { color: #4fd1ff; }
+.ticker-item .tk-val { color: #4fd1ff; font-weight: 700; }
+.ticker-item .tk-chg { font-weight: 600; }
+.ticker-item .tk-chg.up { color: #3ee596; }
+.ticker-item .tk-chg.down { color: #ff6b81; }
+.ticker-item a { color: #6f89bd; text-decoration: underline; }
 .ticker-item .tk-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink:0; }
 
 /* TOPBAR */
@@ -123,7 +185,7 @@ a { color: var(--blue); text-decoration: none; }
   box-shadow: 0 4px 12px rgba(0,87,255,0.35);
 }
 
-.brand-name { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.brand-name { font-family: var(--display); font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
 .brand-sub { font-size: 11px; color: #8ba3d4; font-weight: 400; }
 
 .topbar-meta { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
@@ -169,10 +231,21 @@ a { color: var(--blue); text-decoration: none; }
   background: rgba(0,184,217,0.12); border: 1px solid rgba(0,184,217,0.3); border-radius: 20px;
 }
 
-.hero-title { font-size: 46px; font-weight: 900; color: #fff; letter-spacing: -2px; line-height: 1.02; margin-bottom: 14px; }
+.hero-title { font-family: var(--display); font-size: 46px; font-weight: 900; color: #fff; letter-spacing: -0.3px; line-height: 1.28; margin-bottom: 14px; font-style: italic; padding-bottom: 4px; }
 .hero-title .grad { background: linear-gradient(90deg, #4fd1ff, #3ee596); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
 .hero-desc { font-size: 15px; color: #a9bcdf; max-width: 480px; font-weight: 400; line-height: 1.65; }
+
+.hero-social { display: flex; gap: 10px; margin-top: 18px; }
+
+.hero-social a {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 20px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+  color: #c9d8f5; font-family: var(--mono); font-size: 11.5px; font-weight: 600;
+  text-decoration: none; transition: all 0.15s;
+}
+.hero-social a:hover { background: rgba(79,209,255,0.15); border-color: rgba(79,209,255,0.4); color: #fff; }
 
 .hero-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 .hero-acum-label { font-size: 11px; color: #6f89bd; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
@@ -183,7 +256,7 @@ a { color: var(--blue); text-decoration: none; }
 /* SECTIONS */
 .section { margin: 32px 0; }
 .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--blue); display: flex; align-items: center; gap: 8px; }
+.section-title { font-family: var(--display); font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--blue); display: flex; align-items: center; gap: 8px; }
 .section-title::before { content: ''; width: 3px; height: 14px; background: linear-gradient(180deg, var(--blue), var(--cyan)); border-radius: 2px; }
 
 /* CARDS */
@@ -252,7 +325,7 @@ tbody tr.no-trade td { color: var(--text3); }
 
 /* INFO GRID */
 .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
-.info-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--blue); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--blue-light); }
+.info-title { font-family: var(--display); font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--blue); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--blue-light); }
 .info-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--border); gap: 12px; }
 .info-row:last-child { border-bottom: none; }
 .info-key { font-size: 12px; color: var(--text2); flex-shrink: 0; }
@@ -289,7 +362,7 @@ tbody tr.no-trade td { color: var(--text3); }
   box-shadow: var(--shadow-md);
 }
 
-.admin-head { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.3px; margin-bottom: 4px; }
+.admin-head { font-family: var(--display); font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.3px; margin-bottom: 4px; }
 .admin-subhead { font-size: 12px; color: #8ba3d4; margin-bottom: 18px; }
 
 .admin-gate { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -393,6 +466,12 @@ footer { background: var(--navy); margin-top: 40px; padding: 28px 0; }
 </head>
 <body>
 
+<div class="market-bg" aria-hidden="true">
+  <div class="market-bg-layer market-bg-grid"></div>
+  <div class="market-bg-layer market-bg-line2"></div>
+  <div class="market-bg-layer market-bg-line1"></div>
+</div>
+
 <div class="ticker-bar"><div class="ticker-track" id="tickerTrack"></div></div>
 
 <div class="topbar">
@@ -422,6 +501,11 @@ footer { background: var(--navy); margin-top: 40px; padding: 28px 0; }
         <div class="hero-eyebrow">● Evaluación 30 días · Cuenta demo</div>
         <div class="hero-title">El imán del<br><span class="grad">VWAP</span> en acción</div>
         <div class="hero-desc">GRAVITÓN opera reversión a la media en MNQ Futuros. El VWAP es su imán — el precio regresa a tocarlo. Si los 30 días son rentables, inicia cuenta real con $1,000 USD.</div>
+        <div class="hero-social">
+          <a href="https://www.instagram.com/tradingtrading.futuros/" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://www.youtube.com/@tradingtrading.futuros" target="_blank" rel="noopener">YouTube</a>
+          <a href="https://www.facebook.com/profile.php?id=100036867265736" target="_blank" rel="noopener">Facebook</a>
+        </div>
       </div>
       <div class="hero-right">
         <div class="hero-acum-label">Acumulado demo</div>
@@ -665,18 +749,20 @@ let diasData = [
   { dia:11, fecha:'30-Jun', t1:null,   t2:null,    t3:null,  total:0,      acum:108.70,  vxn:29,   contexto:'Alcista — sin setup en -1σ' },
   { dia:12, fecha:'01-Jul', t1:-30.50, t2:100.00,  t3:null,  total:69.50,  acum:178.20,  vxn:27,   contexto:'Trail N3 +$100 en 5 min' },
   { dia:13, fecha:'02-Jul', t1:-32.80, t2:null,    t3:null,  total:-32.80, acum:145.40,  vxn:27,   contexto:'Bajista — 1 stop, 3 chases abortados' },
+  { dia:14, fecha:'06-Jul', t1:null,   t2:null,    t3:null,  total:0,      acum:145.40,  vxn:27,   contexto:'Alcista — sin setup en -1σ' },
 ];
 
 const tickerItems = [
-  { label:'ÍNDICE', name:'Nasdaq 100 Futures (NQ)', url:'https://mx.investing.com/indices/nq-100-futures' },
-  { label:'VOLATILIDAD', name:'CBOE Nasdaq 100 Volatility (VXN)', url:'https://mx.investing.com/indices/cboe-nasdaq-100-voltility' },
+  { label:'ÍNDICE', name:'Nasdaq 100 Futures (NQ)', value:'30,293.50', change:'+1.49%', dir:'up', url:'https://mx.investing.com/indices/nq-100-futures' },
+  { label:'VOLATILIDAD', name:'CBOE Nasdaq 100 Volatility (VXN)', value:'30.82', change:'-4.70%', dir:'down', url:'https://mx.investing.com/indices/cboe-nasdaq-100-voltility' },
 ];
 function buildTicker(){
   const track = document.getElementById('tickerTrack');
   let html = '';
   for(let r=0;r<2;r++){
     tickerItems.forEach(it=>{
-      html += '<span class="ticker-item"><span class="tk-dot"></span><span class="tk-label">'+it.label+'</span><span class="tk-name">'+it.name+'</span><a href="'+it.url+'" target="_blank" rel="noopener">Ver cotización →</a></span>';
+      const arrow = it.dir==='up' ? '▲' : '▼';
+      html += '<span class="ticker-item"><span class="tk-dot" style="background:'+(it.dir==='up'?'#3ee596':'#ff6b81')+'"></span><span class="tk-label">'+it.label+'</span><span class="tk-name">'+it.name+'</span><span class="tk-val">'+it.value+'</span><span class="tk-chg '+it.dir+'">'+arrow+' '+it.change+'</span><a href="'+it.url+'" target="_blank" rel="noopener">Ver cotización →</a></span>';
     });
   }
   track.innerHTML = html;
