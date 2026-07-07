@@ -1028,12 +1028,29 @@ function submitData(){
 
 renderAll();
 
-// CONTADOR DE VISITANTES — servicio gratuito (Abacus), incrementa 1 por carga de página
-// y persiste el conteo real entre visitas, sin backend propio.
-fetch('https://abacus.jasoncameron.dev/hit/graviton-dashboard-tradingtrading/visitas')
-  .then(r => r.json())
-  .then(d => { document.getElementById('visitorCount').textContent = d.value.toLocaleString('es-MX'); })
-  .catch(() => { document.getElementById('visitorCount').textContent = '—'; });
+// CONTADOR DE VISITANTES — servicio gratuito (Abacus), sin backend propio.
+// Tus propias visitas NO cuentan: la primera vez que entres con
+// ?owner=1 en la URL, tu navegador queda marcado (localStorage) y desde
+// entonces solo LEE el conteo sin incrementarlo, aunque visites sin el parámetro.
+// Link para marcar tu navegador una sola vez:
+// https://alltrainning.github.io/graviton-dashboard/?owner=1
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('owner') === '1') {
+    localStorage.setItem('graviton_owner', '1');
+  }
+  const isOwner = localStorage.getItem('graviton_owner') === '1';
+  const ns = 'graviton-dashboard-tradingtrading';
+  const key = 'visitas';
+  const endpoint = isOwner
+    ? 'https://abacus.jasoncameron.dev/get/' + ns + '/' + key
+    : 'https://abacus.jasoncameron.dev/hit/' + ns + '/' + key;
+
+  fetch(endpoint)
+    .then(r => r.json())
+    .then(d => { document.getElementById('visitorCount').textContent = d.value.toLocaleString('es-MX'); })
+    .catch(() => { document.getElementById('visitorCount').textContent = '—'; });
+})();
 </script>
 </body>
 </html>
