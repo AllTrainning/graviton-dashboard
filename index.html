@@ -650,13 +650,13 @@ footer { background: var(--navy); margin-top: 40px; padding: 28px 0; }
       </div>
       <div class="kpi acc-pos">
         <div class="kpi-label">Mejor día</div>
-        <div class="kpi-val pos">+$97.00</div>
-        <div class="kpi-sub">17 de junio</div>
+        <div class="kpi-val pos" id="kpi-best-val">+$97.00</div>
+        <div class="kpi-sub" id="kpi-best-sub">17 de junio</div>
       </div>
       <div class="kpi acc-neg">
         <div class="kpi-label">Peor día</div>
-        <div class="kpi-val neg">-$63.50</div>
-        <div class="kpi-sub">24 de junio</div>
+        <div class="kpi-val neg" id="kpi-worst-val">-$63.50</div>
+        <div class="kpi-sub" id="kpi-worst-sub">24 de junio</div>
       </div>
     </div>
   </div>
@@ -769,7 +769,7 @@ footer { background: var(--navy); margin-top: 40px; padding: 28px 0; }
         <div class="info-title">Identidad</div>
         <div class="info-row"><span class="info-key">Nombre</span><span class="info-val blue">GRAVITÓN</span></div>
         <div class="info-row"><span class="info-key">Filosofía</span><span class="info-val">El VWAP es el imán del precio</span></div>
-        <div class="info-row"><span class="info-key">Personaje</span><span class="info-val">El Pescador Paciente · Oz</span></div>
+        <div class="info-row"><span class="info-key">Personaje</span><span class="info-val">El Pescador Paciente · Víctor</span></div>
         <div class="info-row"><span class="info-key">Estrategia</span><span class="info-val">Reversión a la media</span></div>
         <div class="info-row"><span class="info-key">Instrumento</span><span class="info-val">MNQ · Micro E-mini Nasdaq</span></div>
         <div class="info-row"><span class="info-key">Instagram</span><span class="info-val blue">@tradingtrading.futuros</span></div>
@@ -839,9 +839,9 @@ let diasData = [
   { dia:13, fecha:'02-Jul', t1:-32.80, t2:null,    t3:null,  total:-32.80, acum:145.40,  vxn:27,   contexto:'Bajista — 1 stop, 3 chases abortados' },
   { dia:14, fecha:'06-Jul', t1:null,   t2:null,    t3:null,  total:0,      acum:145.40,  vxn:27,   contexto:'Alcista — sin setup en -1σ' },
   { dia:15, fecha:'07-Jul', t1:null,   t2:null,    t3:null,  total:0,      acum:145.40,  vxn:26,   contexto:'Bajista fuerte — filtro clímax descartó señal a las 09:45' },
-  { dia:16, fecha:'08-Jul', t1:-32.30, t2:-31.80, t3:-32.10, total:-96.20, acum:49.20,   vxn:27,   contexto:'BUG detectado: log interno mal calculado — 3 stops reales, ver Trade Performance' },
-  { dia:17, fecha:'09-Jul', t1:null, t2:null, t3:null, total:0, acum:49.20, vxn:27, contexto:'Alcista — sin setup en -1σ' },
-  { dia:18, fecha:'10-Jul', t1:-31.80, t2:null, t3:null, total:-31.80, acum:17.40, vxn:26, contexto:'4 señales descartadas (EMA/riesgo), 1 stop real -$31.80 (log mostró -$39, bug ya documentado)' },
+  { dia:16, fecha:'08-Jul', t1:-32.30, t2:-31.80,  t3:-32.10, total:-96.20, acum:49.20,   vxn:27,   contexto:'BUG detectado: log interno mal calculado — 3 stops reales, corrección pendiente al día 30' },
+  { dia:17, fecha:'09-Jul', t1:null,   t2:null,    t3:null,  total:0,      acum:49.20,   vxn:27,   contexto:'Alcista — sin setup en -1σ' },
+  { dia:18, fecha:'10-Jul', t1:-31.80, t2:null,    t3:null,  total:-31.80, acum:17.40,   vxn:26,   contexto:'4 señales descartadas (EMA/riesgo), 1 stop real (log mostró -$39, bug ya documentado)' },
 ];
 
 const tickerConfig = [
@@ -956,6 +956,16 @@ function renderKPIs(){
   document.getElementById('kpi-winrate-sub').textContent=pos.length+' pos · '+neg.length+' neg';
   document.getElementById('kpi-vxn').textContent=vxnActual;
   document.getElementById('hdr-progress').textContent=total+' / 30 días';
+
+  // Mejor y peor día — calculados automáticamente entre los días operados
+  if (operados.length) {
+    const best = operados.reduce((a,b)=> b.total > a.total ? b : a);
+    const worst = operados.reduce((a,b)=> b.total < a.total ? b : a);
+    document.getElementById('kpi-best-val').textContent = '+$' + best.total.toFixed(2);
+    document.getElementById('kpi-best-sub').textContent = best.fecha;
+    document.getElementById('kpi-worst-val').textContent = (worst.total<0?'-':'+') + '$' + Math.abs(worst.total).toFixed(2);
+    document.getElementById('kpi-worst-sub').textContent = worst.fecha;
+  }
 
   const pct=(total/30*100).toFixed(1);
   document.getElementById('progressBar').style.width=pct+'%';
