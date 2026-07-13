@@ -842,6 +842,7 @@ let diasData = [
   { dia:16, fecha:'08-Jul', t1:-32.30, t2:-31.80,  t3:-32.10, total:-96.20, acum:49.20,   vxn:27,   contexto:'BUG detectado: log interno mal calculado — 3 stops reales, corrección pendiente al día 30' },
   { dia:17, fecha:'09-Jul', t1:null,   t2:null,    t3:null,  total:0,      acum:49.20,   vxn:27,   contexto:'Alcista — sin setup en -1σ' },
   { dia:18, fecha:'10-Jul', t1:-31.80, t2:null,    t3:null,  total:-31.80, acum:17.40,   vxn:26,   contexto:'4 señales descartadas (EMA/riesgo), 1 stop real (log mostró -$39, bug ya documentado)' },
+  { dia: 19, fecha: "13-Jul", t1: 21.70, t2: -31.30, t3: null, total: -9.60, acumulado: 7.80, vxn: 24, contexto: "Trade #1 ganador, Trade #2 perdedor 1 min después (sin cooldown - solo aplica tras pérdida)" },
 ];
 
 const tickerConfig = [
