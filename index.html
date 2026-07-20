@@ -844,9 +844,9 @@ let diasData = [
   { dia:18, fecha:'10-Jul', t1:-31.80, t2:null,    t3:null,  total:-31.80, acum:17.40,   vxn:26,   contexto:'4 señales descartadas (EMA/riesgo), 1 stop real (log mostró -$39, bug ya documentado)' },
   { dia:19, fecha:'13-Jul', t1:21.70, t2:-31.30, t3:null, total:-9.60, acum:7.80, vxn:24, contexto:'Trade #1 ganador, Trade #2 perdedor 1 min después (sin cooldown - solo aplica tras pérdida)' },
   { dia:20, fecha:'14-Jul', t1:null, t2:null, t3:null, total:0, acum:7.80, vxn:27, contexto:'Sin señales — mercado no ofreció el setup' },
-  { dia:21, fecha:'15-Jul', t1:5.00, t2:null, t3:null, total:5.00, acum:12.80, vxn:26, contexto:'Trade único, cierre BE/scratch +$5' },
-  { dia:22, fecha:'16-Jul', t1:-34.30, t2:null, t3:null, total:-34.30, acum:-21.50, vxn:25, contexto:'Entradas en zona 29,380–29,400 entre 08:00–08:15 CT — stop tocado' },
-  { dia:23, fecha:'17-Jul', t1:-31.30, t2:null, t3:null, total:-31.30, acum:-52.80, vxn:27, contexto:'VXN 27 — condiciones más duras que el rango del backtest. Stop tocado' },
+  { dia:21, fecha:'15-Jul', t1:5.00, t2:null, t3:null, total:5.00, acum:12.80, vxn:26, contexto:'Trade único, cierre BE/scratch +$5' },    
+  { dia:22, fecha:'16-Jul', t1:-34.30, t2:-31.30, t3:null, total:-65.60, acum:-52.80, vxn:25, contexto:'Entradas en zona 29,380–29,400 entre 08:00–08:15 CT — dos stops tocados' },
+  { dia:23, fecha:'17-Jul', t1:null, t2:null, t3:null, total:0, acum:-52.80, vxn:27, contexto:'Sin operaciones — mercado no ofreció el setup' },
 ];
 
 const tickerConfig = [
